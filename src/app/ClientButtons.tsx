@@ -5,13 +5,14 @@ import Image from "next/image";
 import Share from "./assets/share.png";
 
 export default function ClientButtons() {
+// textarea에서 복사할 텍스트 가져오기
   const getTextToCopy = () => {
     const textarea = document.querySelector(
       "textarea[name='excuseText']"
     ) as HTMLTextAreaElement | null;
     return textarea?.value || "";
   };
-
+// 텍스트 복사 기능
   const handleCopy = () => {
     const text = getTextToCopy();
     if (!text) {

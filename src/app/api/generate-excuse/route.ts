@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const GEMINI_API_KEY = process.env.OPEN_AI_API 
+const GEMINI_API_KEY = process.env.OPE 
 
 export async function POST(request: NextRequest) {
   try {
     const { style, text } = await request.json();
 
+    // 필수 입력값 확인
     if (!style || !text) {
       return NextResponse.json(
         { error: '입력값이 누락되었습니다.' },
@@ -13,6 +14,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+     // 스타일 숫자를 스타일 이름으로 매핑
     const styleMap: Record<string, string> = {
       '1': '감성적',
       '2': '현실적',
@@ -22,6 +24,7 @@ export async function POST(request: NextRequest) {
 
     const selectedStyleName = styleMap[style] || '일반적으로';
 
+    // Gemini에게 전달할 프롬프트 구성
     console.log(style, selectedStyleName)
     const prompt = `너는 변명 생성 AI야. 사용자가 입력한 기본 변명 내용을 바탕으로, 다음 네 가지 스타일 중 ${selectedStyleName}에 맞게 변명을 만들어줘.
 
@@ -53,7 +56,7 @@ export async function POST(request: NextRequest) {
 ${style}에 맞는 창의적이고 자연스러운 변명 한 문장 이상을 출력해줘.
 
 `;
-
+    // Gemini API 호출
     const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
@@ -71,7 +74,7 @@ ${style}에 맞는 창의적이고 자연스러운 변명 한 문장 이상을 �
         ],
       }),
     });
-
+    // Gemini 응답에서 생성된 변명 추출
     const geminiData = await geminiRes.json();
     const generatedExcuse =
       geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ??
